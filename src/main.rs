@@ -10,7 +10,7 @@ fn load_servics() {
     let mut s = String::new();
     f.read_to_string(&mut s).expect("Cannot read");
     for lines in s.lines() {
-        println!("{}", lines);
+        let line = lines.split('#').next().unwrap_or("").trim();
         println!("+++++++++++++++++++++++++++++");
     }
     // println!("{}", s);
