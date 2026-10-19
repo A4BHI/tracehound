@@ -9,7 +9,11 @@ fn load_servics() {
     let mut f = File::open(path).expect("Error reading file");
     let mut s = String::new();
     f.read_to_string(&mut s).expect("Cannot read");
-    println!("{}", s);
+    for lines in s.lines() {
+        println!("{}", lines);
+        println!("+++++++++++++++++++++++++++++");
+    }
+    // println!("{}", s);
 }
 
 fn main() -> Result<(), io::Error> {
