@@ -11,7 +11,15 @@ fn load_servics() {
     f.read_to_string(&mut s).expect("Cannot read");
     for lines in s.lines() {
         let line = lines.split('#').next().unwrap_or("").trim();
-        println!("+++++++++++++++++++++++++++++");
+        // println!("{}", line);
+        // println!("+++++++++++++++++++++++++++++");
+        if line.is_empty() {
+            continue;
+        }
+
+        let Some(service_entry) = line.split_whitespace().nth(1) else {
+            continue;
+        };
     }
     // println!("{}", s);
 }
