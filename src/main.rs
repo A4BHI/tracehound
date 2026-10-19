@@ -3,6 +3,7 @@ use std::io::{self, Read, Write};
 use std::net::{SocketAddr, TcpStream};
 use std::path::Path;
 use std::time::Duration;
+use std::u16;
 
 fn load_servics(ip: std::net::IpAddr) {
     let path = Path::new("/etc/services");
@@ -30,20 +31,24 @@ fn load_servics(ip: std::net::IpAddr) {
         }
 
         if let Ok(port) = port.parse::<u16>() {
-            let addr = SocketAddr::new(ip, port);
-            match TcpStream::connect_timeout(&addr, Duration::new(2, 0)) {
-                Ok(_con) => {
-                    println!("Open => {}/{}", port, protocol);
-                }
-                Err(err) => {
-                    println!("Closed => {}/{} : {}", port, protocol, err);
-                }
+           scan(ip, port, protocol);
             }
         }
     }
     // println!("{}", s);
 }
 
+fn scan(ip: std::net::IpAddr, port: u16, protocol: &str) {
+    let addr = SocketAddr::new(ip, port);
+    match TcpStream::connect_timeout(&addr, Duration::new(2, 0)) {
+        Ok(_con) => {
+            println!("Open => {}/{}", port, protocol);
+        }
+        Err(_err) => {
+            // println!("Closed => {}/{} : {}", port, protocol, err);
+        }
+    }
+}
 fn main() -> Result<(), io::Error> {
     let mut rawip = String::new();
     println!("Welcome to ruscan!");
