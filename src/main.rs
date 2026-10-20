@@ -5,9 +5,9 @@ use std::path::Path;
 use std::thread;
 use std::time::Duration;
 use std::u16;
-
 fn load_servics(ip: std::net::IpAddr) {
     let mut ports: Vec<u16> = Vec::new();
+
     let path = Path::new("/etc/services");
     let mut f = File::open(path).expect("Error reading file");
     let mut s = String::new();
@@ -33,19 +33,24 @@ fn load_servics(ip: std::net::IpAddr) {
         }
 
         if let Ok(port) = port.parse::<u16>() {
-            scan(ip, port, protocol);
+            // scan(ip, port, protocol);
+            ports.push(port);
         }
     }
+
+    scan(ip, "tcp", ports);
 }
 
-fn scan(ip: std::net::IpAddr, port: u16, protocol: &str) {
-    let addr = SocketAddr::new(ip, port);
-    match TcpStream::connect_timeout(&addr, Duration::new(2, 0)) {
-        Ok(_con) => {
-            println!("Open => {}/{}", port, protocol);
-        }
-        Err(_err) => {
-            // println!("Closed => {}/{} : {}", port, protocol, err);
+fn scan(ip: std::net::IpAddr, protocol: &str, ports: Vec<u16>) {
+    for port in ports {
+        let addr = SocketAddr::new(ip, port);
+        match TcpStream::connect_timeout(&addr, Duration::new(2, 0)) {
+            Ok(_con) => {
+                println!("Open => {}/{}", port, protocol);
+            }
+            Err(_err) => {
+                // println!("Closed => {}/{} : {}", port, protocol, err);
+            }
         }
     }
 }
@@ -62,5 +67,6 @@ fn main() -> Result<(), io::Error> {
         .parse::<std::net::IpAddr>()
         .expect("Error parsing");
     load_servics(ip);
+
     Ok(())
 }
