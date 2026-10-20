@@ -2,10 +2,12 @@ use std::fs::File;
 use std::io::{self, Read, Write};
 use std::net::{SocketAddr, TcpStream};
 use std::path::Path;
+use std::thread;
 use std::time::Duration;
 use std::u16;
 
 fn load_servics(ip: std::net::IpAddr) {
+    let mut ports: Vec<u16> = Vec::new();
     let path = Path::new("/etc/services");
     let mut f = File::open(path).expect("Error reading file");
     let mut s = String::new();
@@ -31,11 +33,9 @@ fn load_servics(ip: std::net::IpAddr) {
         }
 
         if let Ok(port) = port.parse::<u16>() {
-           scan(ip, port, protocol);
-            }
+            scan(ip, port, protocol);
         }
     }
-    // println!("{}", s);
 }
 
 fn scan(ip: std::net::IpAddr, port: u16, protocol: &str) {
