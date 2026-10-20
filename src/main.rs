@@ -45,19 +45,17 @@ fn scan(ip: std::net::IpAddr, protocol: &str, ports: &Vec<u16>, handles: &mut Ve
         let worker_protocol = protocol.to_owned();
 
         let h = thread::spawn(move || {
-            println!("Worker started");
             for port in worker_ports {
                 let addr = SocketAddr::new(ip, port);
                 match TcpStream::connect_timeout(&addr, Duration::new(2, 0)) {
                     Ok(_con) => {
                         println!("Open => {}/{}", port, worker_protocol);
                     }
-                    Err(err) => {
-                        println!("Closed => {}/{} : {}", port, worker_protocol, err);
+                    Err(_err) => {
+                        // println!("Closed => {}/{} : {}", port, worker_protocol, err);
                     }
                 }
             }
-            println!("Worker finished");
         });
 
         handles.push(h);
@@ -67,7 +65,7 @@ fn main() -> Result<(), io::Error> {
     let mut ports: Vec<u16> = Vec::new();
     let mut handles: Vec<JoinHandle<()>> = Vec::new();
     let mut rawip = String::new();
-    println!("Welcome to ruscan!");
+    println!("Welcome to tracehound!");
     io::stdout()
         .write_all("Input ip adress:".as_bytes())
         .expect("Invalid INput");
