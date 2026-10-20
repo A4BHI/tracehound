@@ -2,11 +2,10 @@ use std::fs::File;
 use std::io::{self, Read, Write};
 use std::net::{SocketAddr, TcpStream};
 use std::path::Path;
-use std::thread;
+use std::thread::{self, JoinHandle};
 use std::time::Duration;
 use std::u16;
-fn load_servics(ip: std::net::IpAddr) {
-    let mut ports: Vec<u16> = Vec::new();
+fn load_servics(ip: std::net::IpAddr,  ports : &mut Vec<u16>) {
 
     let path = Path::new("/etc/services");
     let mut f = File::open(path).expect("Error reading file");
@@ -42,6 +41,14 @@ fn load_servics(ip: std::net::IpAddr) {
 }
 
 fn scan(ip: std::net::IpAddr, protocol: &str, ports: Vec<u16>) {
+    let workers = 8;
+    let size = ports.len().div_ceil(workers);
+    for chunk in ports.chunks(size) {
+        let worker_ports = chunk.to_vec();
+
+        let h = thread::spa
+
+    }
     for port in ports {
         let addr = SocketAddr::new(ip, port);
         match TcpStream::connect_timeout(&addr, Duration::new(2, 0)) {
@@ -55,6 +62,8 @@ fn scan(ip: std::net::IpAddr, protocol: &str, ports: Vec<u16>) {
     }
 }
 fn main() -> Result<(), io::Error> {
+    let  mut ports : Vec<u16> = Vec::new();
+    let mut handles :Vec<JoinHandle<()>>  = Vec::new();
     let mut rawip = String::new();
     println!("Welcome to ruscan!");
     io::stdout()
@@ -66,7 +75,7 @@ fn main() -> Result<(), io::Error> {
         .trim()
         .parse::<std::net::IpAddr>()
         .expect("Error parsing");
-    load_servics(ip);
+    load_servics(ip,&mut ports);
 
     Ok(())
 }
